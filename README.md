@@ -581,11 +581,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- 📧 Email: support@onlineai.com
-- 💬 Discord: [Join our community](https://discord.gg/onlineai)
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/OnlineAI/issues)
-- 📚 Documentation: [Full Documentation](https://docs.onlineai.com)
+- 📧 Email: ethachu21@gmail.com
+- 🐛 Issues: [GitHub Issues](https://github.com/ethachu21/OnlineAI/issues)
 
 ---
 
-**Made with ❤️ by the OnlineAI team** 
+**Made with ❤️ by ethachu21** 
