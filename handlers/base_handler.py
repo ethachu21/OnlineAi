@@ -19,7 +19,7 @@ class GenerationHandler(ABC):
         pass
     
     @abstractmethod
-    def generate_stream(self, prompt: str, messages: List[Dict] = None):
+    def generate_stream(self, prompt: str, messages: List[Dict] = None, use_streaming_timeout: bool = False):
         """Generate a streaming response using this handler"""
         pass
     

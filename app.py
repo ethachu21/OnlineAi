@@ -209,8 +209,8 @@ class AiHandler:
             try:
                 # Check if handler supports streaming
                 if handler.supports_streaming():
-                    # Try streaming generation - don't use run_in_executor for generators
-                    stream_gen = handler.generate_stream(self.prompt, self.messages)
+                    # Try streaming generation with shorter timeout
+                    stream_gen = handler.generate_stream(self.prompt, self.messages, use_streaming_timeout=True)
                     
                     # Stream the results
                     chunks_received = 0

@@ -67,7 +67,7 @@ class GoogleAiHandler(GenerationHandler):
         """Google AI supports system roles natively"""
         return True
     
-    def generate_stream(self, prompt: str, messages: List[Dict] = None):
+    def generate_stream(self, prompt: str, messages: List[Dict] = None, use_streaming_timeout: bool = False):
         """Generate a streaming response using Google AI API"""
         if not self.is_available():
             yield {
@@ -135,11 +135,12 @@ class GoogleAiHandler(GenerationHandler):
                     }
                     
                     # Make the streaming API call
+                    timeout = config.STREAMING_TIMEOUT if use_streaming_timeout else config.API_TIMEOUT
                     response = requests.post(
                         f"{url}?key={self.api_keys[self.current_key_index]}", 
                         headers=headers, 
                         json=data, 
-                        timeout=config.API_TIMEOUT, 
+                        timeout=timeout, 
                         stream=True
                     )
                     
@@ -166,6 +167,14 @@ class GoogleAiHandler(GenerationHandler):
                                                         }
                                     except json.JSONDecodeError:
                                         continue
+                        # Send done signal
+                        yield {
+                            "success": True,
+                            "done": True,
+                            "provider": self.name,
+                            "model": current_model,
+                            "streaming": True
+                        }
                         return
                     else:
                         logger.warning(f"Google AI {current_model} key {self.current_key_index + 1} failed: HTTP {response.status_code}")

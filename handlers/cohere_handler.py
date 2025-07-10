@@ -103,7 +103,7 @@ class CohereHandler(GenerationHandler):
         
         return request_data
     
-    def generate_stream(self, prompt: str, messages: List[Dict] = None):
+    def generate_stream(self, prompt: str, messages: List[Dict] = None, use_streaming_timeout: bool = False):
         """Generate a streaming response using Cohere API"""
         if not self.is_available():
             yield {
@@ -136,8 +136,9 @@ class CohereHandler(GenerationHandler):
                         "Content-Type": "application/json"
                     }
                     
+                    timeout = config.STREAMING_TIMEOUT if use_streaming_timeout else config.API_TIMEOUT
                     response = requests.post(url, headers=headers, json=request_data, 
-                                           timeout=config.API_TIMEOUT, stream=True)
+                                           timeout=timeout, stream=True)
                     
                     if response.status_code == 200:
                         for line in response.iter_lines():
@@ -158,6 +159,14 @@ class CohereHandler(GenerationHandler):
                                                 }
                                     except json.JSONDecodeError:
                                         continue
+                        # Send done signal
+                        yield {
+                            "success": True,
+                            "done": True,
+                            "provider": self.name,
+                            "model": current_model,
+                            "streaming": True
+                        }
                         return
                     else:
                         logger.warning(f"Cohere {current_model} key {self.current_key_index + 1} failed: HTTP {response.status_code}")

@@ -67,7 +67,7 @@ class HuggingFaceHandler(GenerationHandler):
         """Hugging Face models don't support system roles"""
         return False  # Will use jailbreak method
     
-    def generate_stream(self, prompt: str, messages: List[Dict] = None):
+    def generate_stream(self, prompt: str, messages: List[Dict] = None, use_streaming_timeout: bool = False):
         """Generate a streaming response (not supported by Hugging Face)"""
         # Hugging Face doesn't support streaming, so we'll fall back to regular generation
         result = self.generate(prompt, messages)
