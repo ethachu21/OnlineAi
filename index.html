@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Handler API - Live Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .output-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            position: relative;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .icon {
+            font-size: 1.2em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .model-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .model-table th, .model-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .model-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        
+
+        
+        .model-score {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .score-high {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .score-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .score-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .output {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        .status.processing {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            border: 1px solid #00b894;
+            color: #155724;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            border: 1px solid #d63031;
+            color: #721c24;
+        }
+        
+        .loading {
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .metadata {
+            margin-top: 15px;
+            padding: 15px;
+            background: #1a202c;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #a0aec0;
+        }
+        
+        .metadata strong {
+            color: #4CAF50;
+        }
+        
+        .typing-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+            margin-left: 5px;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: scale(1); }
+            30% { transform: scale(1.5); }
+        }
+        
+        .conversation-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .conversation-item .role {
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+        
+        .add-message {
+            background: #e9ecef;
+            border: 2px dashed #6c757d;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+        
+        .add-message:hover {
+            background: #dee2e6;
+            border-color: #4CAF50;
+        }
+        
+        .provider-status {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .provider-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .provider-badge.available {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .provider-badge.unavailable {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .provider-badge.streaming {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Handler API</h1>
+            <p>Multi-Provider AI Generation with Live Streaming</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">
+                    <span class="icon">📝</span>
+                    Input Configuration
+                </h2>
+                
+                <div class="form-group">
+                    <label for="system-role">System Role (Optional)</label>
+                    <textarea id="system-role" placeholder="Enter system instructions here..." rows="2">You are a helpful AI assistant. Be creative and engaging in your responses.</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="prompt">Prompt *</label>
+                    <textarea id="prompt" placeholder="Enter your question or prompt here...">Tell me a creative story about a robot learning to paint</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="provider">AI Provider</label>
+                    <select id="provider">
+                        <option value="">Auto (Fallback System)</option>
+                        <option value="google">Google Gemini</option>
+                        <option value="google:gemini-1.5-flash">Google Gemini 1.5 Flash</option>
+                        <option value="google:gemini-1.5-pro">Google Gemini 1.5 Pro</option>
+                        <option value="openai">OpenAI GPT</option>
+                        <option value="openai:gpt-4">OpenAI GPT-4</option>
+                        <option value="openai:gpt-3.5-turbo">OpenAI GPT-3.5 Turbo</option>
+                        <option value="anthropic">Anthropic Claude</option>
+                        <option value="anthropic:claude-3-opus-20240229">Anthropic Claude 3 Opus</option>
+                        <option value="anthropic:claude-3-sonnet-20240229">Anthropic Claude 3 Sonnet</option>
+                        <option value="meta">Meta Llama</option>
+                        <option value="meta:llama-2-70b-chat">Meta Llama 2 70B</option>
+                        <option value="huggingface">Hugging Face</option>
+                    </select>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="streaming" checked>
+                    <label for="streaming">Enable Streaming (Real-time response)</label>
+                </div>
+                
+                <div class="form-group">
+                    <label>Conversation History</label>
+                    <div id="messages-container">
+                        <!-- Messages will be added here -->
+                    </div>
+                    <div class="add-message" onclick="addMessage()">
+                        ➕ Add Previous Message
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-primary" onclick="generateResponse()">
+                        🚀 Generate Response
+                    </button>
+                    <button class="btn-secondary" onclick="checkStatus()">
+                        📊 Check Status
+                    </button>
+
+
+                    <button class="btn-danger" onclick="clearOutput()">
+                        🗑️ Clear Output
+                    </button>
+                </div>
+            </div>
+            
+            <div class="output-section">
+                <h2 class="section-title">
+                    <span class="icon">💬</span>
+                    AI Response
+                    <span id="typing-indicator" class="typing-indicator" style="display: none;"></span>
+                </h2>
+                
+                <div id="status-area"></div>
+                <div id="output" class="output">Ready to generate AI responses! 🎯
+
+📋 Instructions:
+1. Enter your prompt in the text area
+2. Choose an AI provider or use auto-fallback
+3. Toggle streaming on/off
+4. Click "Generate Response" to start
+5. Watch the magic happen! ✨
+
+💡 Pro Tips:
+• Streaming shows responses in real-time
+• Fallback system tries multiple providers
+• Check status to see available providers
+• Add conversation history for context</div>
+                <div id="metadata" class="metadata" style="display: none;">
+                    <strong>Response Metadata:</strong>
+                    <div id="metadata-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEventSource = null;
+        let messageCounter = 0;
+        
+        // Load provider status on page load
+        window.onload = function() {
+            checkStatus();
+        };
+        
+        function addMessage() {
+            const container = document.getElementById('messages-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'conversation-item';
+            messageDiv.innerHTML = `
+                <select class="role-select" style="width: 100px; margin-bottom: 10px;">
+                    <option value="user">User</option>
+                    <option value="assistant">Assistant</option>
+                    <option value="system">System</option>
+                </select>
+                <button style="float: right; background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;" onclick="this.parentElement.remove()">Remove</button>
+                <textarea placeholder="Enter message content..." style="width: 100%; height: 60px; margin-top: 5px;"></textarea>
+            `;
+            container.appendChild(messageDiv);
+        }
+        
+        function getMessages() {
+            const messages = [];
+            const messageItems = document.querySelectorAll('.conversation-item');
+            messageItems.forEach(item => {
+                const role = item.querySelector('.role-select').value;
+                const content = item.querySelector('textarea').value.trim();
+                if (content) {
+                    messages.push({ role, content });
+                }
+            });
+            return messages;
+        }
+        
+        function generateResponse() {
+            const prompt = document.getElementById('prompt').value.trim();
+            const provider = document.getElementById('provider').value;
+            const streaming = document.getElementById('streaming').checked;
+            const systemRole = document.getElementById('system-role').value.trim();
+            const messages = getMessages();
+            
+            if (!prompt) {
+                showStatus('Please enter a prompt', 'error');
+                return;
+            }
+            
+            // Add system role to messages if provided
+            if (systemRole) {
+                messages.unshift({
+                    role: 'system',
+                    content: systemRole
+                });
+            }
+            
+            // Clear previous output
+            const output = document.getElementById('output');
+            const metadata = document.getElementById('metadata');
+            const metadataContent = document.getElementById('metadata-content');
+            
+            output.textContent = '';
+            metadata.style.display = 'none';
+            metadataContent.innerHTML = '';
+            
+            // Close previous connection if exists
+            if (currentEventSource) {
+                currentEventSource.close();
+            }
+            
+            const requestData = {
+                prompt: prompt,
+                stream: streaming,
+                messages: messages
+            };
+            
+            if (provider) {
+                requestData.preference = provider;
+            }
+            
+            if (streaming) {
+                startStreaming(requestData);
+            } else {
+                startRegularRequest(requestData);
+            }
+        }
+        
+        function startStreaming(requestData) {
+            showStatus('Starting streaming request...', 'processing');
+            document.getElementById('typing-indicator').style.display = 'inline-block';
+            
+            fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                
+                function readStream() {
+                    return reader.read().then(({ done, value }) => {
+                        if (done) {
+                            document.getElementById('typing-indicator').style.display = 'none';
+                            showStatus('Stream completed!', 'success');
+                            return;
+                        }
+                        
+                        buffer += decoder.decode(value, { stream: true });
+                        const lines = buffer.split('\n');
+                        buffer = lines.pop(); // Keep incomplete line in buffer
+                        
+                        lines.forEach(line => {
+                            if (line.trim().startsWith('data: ')) {
+                                try {
+                                    const data = JSON.parse(line.trim().substring(6));
+                                    handleStreamData(data);
+                                } catch (e) {
+                                    console.error('Error parsing stream data:', e);
+                                }
+                            }
+                        });
+                        
+                        return readStream();
+                    });
+                }
+                
+                return readStream();
+            })
+            .catch(error => {
+                console.error('Streaming error:', error);
+                document.getElementById('typing-indicator').style.display = 'none';
+                showStatus(`Error: ${error.message}`, 'error');
+            });
+        }
+        
+        function startRegularRequest(requestData) {
+            showStatus('Sending request...', 'processing');
+            
+            fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('output').textContent = data.response;
+                    showMetadata(data);
+                    showStatus('Response generated successfully!', 'success');
+                } else {
+                    showStatus(`Error: ${data.error}`, 'error');
+                    document.getElementById('output').textContent = `Error: ${data.error}`;
+                }
+            })
+            .catch(error => {
+                console.error('Request error:', error);
+                showStatus(`Error: ${error.message}`, 'error');
+            });
+        }
+        
+        function handleStreamData(data) {
+            const output = document.getElementById('output');
+            
+            if (data.processing) {
+                showStatus(data.message, 'processing');
+            } else if (data.success && data.response) {
+                output.textContent += data.response;
+                output.scrollTop = output.scrollHeight;
+                
+                // Show metadata for the final response
+                if (data.fallback_info) {
+                    showMetadata(data);
+                }
+            } else if (data.done) {
+                showStatus('Response completed!', 'success');
+                document.getElementById('typing-indicator').style.display = 'none';
+            } else if (!data.success) {
+                showStatus(`Error: ${data.error}`, 'error');
+                document.getElementById('typing-indicator').style.display = 'none';
+            }
+        }
+        
+        function showMetadata(data) {
+            const metadata = document.getElementById('metadata');
+            const metadataContent = document.getElementById('metadata-content');
+            
+            let metadataHtml = '';
+            if (data.provider) metadataHtml += `<strong>Provider:</strong> ${data.provider}<br>`;
+            if (data.model) metadataHtml += `<strong>Model:</strong> ${data.model}<br>`;
+            if (data.streaming !== undefined) metadataHtml += `<strong>Streaming:</strong> ${data.streaming ? 'Yes' : 'No'}<br>`;
+            if (data.api_key_index) metadataHtml += `<strong>API Key:</strong> ${data.api_key_index}/${data.total_api_keys}<br>`;
+            if (data.total_attempts) metadataHtml += `<strong>Total Attempts:</strong> ${data.total_attempts}<br>`;
+            if (data.models_tried) metadataHtml += `<strong>Models Tried:</strong> ${data.models_tried.join(', ')}<br>`;
+            if (data.fallback_info) {
+                metadataHtml += `<strong>Handlers Tried:</strong> ${data.fallback_info.handlers_tried.join(', ')}<br>`;
+                metadataHtml += `<strong>Handler Used:</strong> ${data.fallback_info.handler_used}<br>`;
+            }
+
+            
+            metadataContent.innerHTML = metadataHtml;
+            metadata.style.display = 'block';
+        }
+        
+
+        
+        function showStatus(message, type) {
+            const statusArea = document.getElementById('status-area');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            statusArea.appendChild(statusDiv);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                statusDiv.remove();
+            }, 5000);
+        }
+        
+        function checkStatus() {
+            showStatus('Checking provider status...', 'processing');
+            
+            fetch('/status')
+            .then(response => response.json())
+            .then(data => {
+                const output = document.getElementById('output');
+                let statusText = '📊 AI Handler Status Report\n\n';
+                statusText += `Total Handlers: ${data.total_handlers}\n`;
+                statusText += `Available Handlers: ${data.available_handlers}\n\n`;
+                statusText += '🔧 Handler Details:\n';
+                
+                data.handlers.forEach(handler => {
+                    const status = handler.available ? '✅' : '❌';
+                    const streaming = handler.streaming_support ? '🔄' : '⏸️';
+                    statusText += `${status} ${handler.name}: ${handler.details} ${streaming}\n`;
+                });
+                
+                statusText += '\n💡 Legend:\n';
+                statusText += '✅ Available | ❌ Not Available\n';
+                statusText += '🔄 Streaming Support | ⏸️ No Streaming\n';
+                
+                output.textContent = statusText;
+                showStatus('Status check completed!', 'success');
+                
+                // Update provider status indicators
+                updateProviderStatus(data.handlers);
+            })
+            .catch(error => {
+                console.error('Status check error:', error);
+                showStatus(`Error checking status: ${error.message}`, 'error');
+            });
+        }
+        
+        function updateProviderStatus(handlers) {
+            // You can add a status indicator section here if needed
+            console.log('Provider status updated:', handlers);
+        }
+        
+        function clearOutput() {
+            document.getElementById('output').textContent = 'Output cleared. Ready for new requests! 🎯';
+            document.getElementById('metadata').style.display = 'none';
+            document.getElementById('status-area').innerHTML = '';
+            document.getElementById('typing-indicator').style.display = 'none';
+            
+            if (currentEventSource) {
+                currentEventSource.close();
+            }
+        }
+        
+        // Handle Enter key in prompt textarea
+        document.getElementById('prompt').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                generateResponse();
+            }
+        });
+    </script>
+</body>
+</html> 
