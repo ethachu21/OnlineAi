@@ -331,13 +331,21 @@ async def generate():
     if not data:
         return jsonify({"error": "No JSON data provided"}), 400
     
-    prompt = data.get('prompt')
+    prompt = data.get('prompt', '')
     preference = data.get('preference')
     messages = data.get('messages', [])
     stream = data.get('stream', False)
     
+    # If prompt is empty but we have messages, use the last user message as the prompt
+    if not prompt and messages:
+        # Find the last user message to use as the prompt
+        for msg in reversed(messages):
+            if msg.get('role') == 'user':
+                prompt = msg.get('content', '')
+                break
+    
     if not prompt:
-        return jsonify({"error": "Prompt is required"}), 400
+        return jsonify({"error": "Prompt is required (either as 'prompt' field or as a user message)"}), 400
     
     try:
         # Create AiHandler instance

@@ -141,7 +141,11 @@ class IBMWatsonHandler(GenerationHandler):
                             elif role == 'assistant':
                                 message_content += f"Assistant: {content}\n"
                     
-                    message_content += f"User: {prompt}\nAssistant:"
+                    # Only add the current prompt if it's not already the last user message
+                    if not processed_messages or processed_messages[-1].get('content') != prompt:
+                        message_content += f"User: {prompt}\nAssistant:"
+                    else:
+                        message_content += "Assistant:"
                     
                     url = f"{self.base_url}/text/generation"
                     headers = {
@@ -265,7 +269,11 @@ class IBMWatsonHandler(GenerationHandler):
                             elif role == 'assistant':
                                 message_content += f"Assistant: {content}\n"
                     
-                    message_content += f"User: {prompt}\nAssistant:"
+                    # Only add the current prompt if it's not already the last user message
+                    if not processed_messages or processed_messages[-1].get('content') != prompt:
+                        message_content += f"User: {prompt}\nAssistant:"
+                    else:
+                        message_content += "Assistant:"
                     
                     url = f"{self.base_url}/text/generation"
                     headers = {

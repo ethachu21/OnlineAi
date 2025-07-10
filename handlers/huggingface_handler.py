@@ -122,8 +122,11 @@ class HuggingFaceHandler(GenerationHandler):
                             elif msg.get('role') == 'assistant':
                                 input_text += f"Assistant: {msg.get('content', '')}\n"
                     
-                    # Add the current prompt
-                    input_text += f"User: {prompt}\nAssistant:"
+                    # Only add the current prompt if it's not already the last user message
+                    if not processed_messages or processed_messages[-1].get('content') != prompt:
+                        input_text += f"User: {prompt}\nAssistant:"
+                    else:
+                        input_text += "Assistant:"
                     
                     # Prepare the request
                     url = f"{self.base_url}/{current_model}"

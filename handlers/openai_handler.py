@@ -105,11 +105,12 @@ class OpenAiHandler(GenerationHandler):
                                 "content": msg.get('content', '')
                             })
                     
-                    # Add the current prompt
-                    openai_messages.append({
-                        "role": "user",
-                        "content": prompt
-                    })
+                    # Only add the current prompt if it's not already the last user message
+                    if not processed_messages or processed_messages[-1].get('content') != prompt:
+                        openai_messages.append({
+                            "role": "user",
+                            "content": prompt
+                        })
                     
                     # Prepare the request
                     url = f"{self.base_url}/chat/completions"
@@ -232,11 +233,12 @@ class OpenAiHandler(GenerationHandler):
                                 "content": msg.get('content', '')
                             })
                     
-                    # Add the current prompt
-                    openai_messages.append({
-                        "role": "user",
-                        "content": prompt
-                    })
+                    # Only add the current prompt if it's not already the last user message
+                    if not processed_messages or processed_messages[-1].get('content') != prompt:
+                        openai_messages.append({
+                            "role": "user",
+                            "content": prompt
+                        })
                     
                     # Prepare the request
                     url = f"{self.base_url}/chat/completions"

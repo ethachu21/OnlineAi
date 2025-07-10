@@ -113,11 +113,12 @@ class GoogleAiHandler(GenerationHandler):
                                     "parts": [{"text": msg.get('content', '')}]
                                 })
                     
-                    # Add the current prompt
-                    contents.append({
-                        "role": "user",
-                        "parts": [{"text": prompt}]
-                    })
+                    # Only add the current prompt if it's not already the last user message
+                    if not processed_messages or processed_messages[-1].get('content') != prompt:
+                        contents.append({
+                            "role": "user",
+                            "parts": [{"text": prompt}]
+                        })
                     
                     # Prepare the request
                     url = f"{self.base_url}/{current_model}:streamGenerateContent"
@@ -242,11 +243,12 @@ class GoogleAiHandler(GenerationHandler):
                                     "parts": [{"text": msg.get('content', '')}]
                                 })
                     
-                    # Add the current prompt
-                    contents.append({
-                        "role": "user",
-                        "parts": [{"text": prompt}]
-                    })
+                    # Only add the current prompt if it's not already the last user message
+                    if not processed_messages or processed_messages[-1].get('content') != prompt:
+                        contents.append({
+                            "role": "user",
+                            "parts": [{"text": prompt}]
+                        })
                     
                     # Prepare the request
                     url = f"{self.base_url}/{current_model}:generateContent"

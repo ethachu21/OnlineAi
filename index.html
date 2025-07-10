@@ -414,25 +414,6 @@
                     <textarea id="prompt" placeholder="Enter your question or prompt here...">Tell me a creative story about a robot learning to paint</textarea>
                 </div>
                 
-                <div class="form-group">
-                    <label for="provider">AI Provider</label>
-                    <select id="provider">
-                        <option value="">Auto (Fallback System)</option>
-                        <option value="google">Google Gemini</option>
-                        <option value="google:gemini-1.5-flash">Google Gemini 1.5 Flash</option>
-                        <option value="google:gemini-1.5-pro">Google Gemini 1.5 Pro</option>
-                        <option value="openai">OpenAI GPT</option>
-                        <option value="openai:gpt-4">OpenAI GPT-4</option>
-                        <option value="openai:gpt-3.5-turbo">OpenAI GPT-3.5 Turbo</option>
-                        <option value="anthropic">Anthropic Claude</option>
-                        <option value="anthropic:claude-3-opus-20240229">Anthropic Claude 3 Opus</option>
-                        <option value="anthropic:claude-3-sonnet-20240229">Anthropic Claude 3 Sonnet</option>
-                        <option value="meta">Meta Llama</option>
-                        <option value="meta:llama-2-70b-chat">Meta Llama 2 70B</option>
-                        <option value="huggingface">Hugging Face</option>
-                    </select>
-                </div>
-                
                 <div class="checkbox-group">
                     <input type="checkbox" id="streaming" checked>
                     <label for="streaming">Enable Streaming (Real-time response)</label>
@@ -475,13 +456,13 @@
 
 📋 Instructions:
 1. Enter your prompt in the text area
-2. Choose an AI provider or use auto-fallback
-3. Toggle streaming on/off
-4. Click "Generate Response" to start
-5. Watch the magic happen! ✨
+2. Toggle streaming on/off
+3. Click "Generate Response" to start
+4. Watch the magic happen! ✨
 
 💡 Pro Tips:
-• Streaming shows responses in real-time
+• Uses intelligent auto-fallback system
+• Streaming shows responses in real-time  
 • Fallback system tries multiple providers
 • Check status to see available providers
 • Add conversation history for context</div>
@@ -533,7 +514,6 @@
         
         function generateResponse() {
             const prompt = document.getElementById('prompt').value.trim();
-            const provider = document.getElementById('provider').value;
             const streaming = document.getElementById('streaming').checked;
             const systemRole = document.getElementById('system-role').value.trim();
             const messages = getMessages();
@@ -551,6 +531,12 @@
                 });
             }
             
+            // Add the current prompt as the last user message
+            messages.push({
+                role: 'user',
+                content: prompt
+            });
+            
             // Clear previous output
             const output = document.getElementById('output');
             const metadata = document.getElementById('metadata');
@@ -566,14 +552,10 @@
             }
             
             const requestData = {
-                prompt: prompt,
+                prompt: '',  // Send empty prompt since it's now in messages
                 stream: streaming,
                 messages: messages
             };
-            
-            if (provider) {
-                requestData.preference = provider;
-            }
             
             if (streaming) {
                 startStreaming(requestData);

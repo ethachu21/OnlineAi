@@ -105,11 +105,12 @@ class PerplexityHandler(GenerationHandler):
                                 "content": msg.get('content', '')
                             })
                     
-                    # Add the current prompt
-                    perplexity_messages.append({
-                        "role": "user",
-                        "content": prompt
-                    })
+                    # Only add the current prompt if it's not already the last user message
+                    if not processed_messages or processed_messages[-1].get('content') != prompt:
+                        perplexity_messages.append({
+                            "role": "user",
+                            "content": prompt
+                        })
                     
                     # Prepare the request
                     headers = {
@@ -222,11 +223,12 @@ class PerplexityHandler(GenerationHandler):
                                 "content": msg.get('content', '')
                             })
                     
-                    # Add the current prompt
-                    perplexity_messages.append({
-                        "role": "user",
-                        "content": prompt
-                    })
+                    # Only add the current prompt if it's not already the last user message
+                    if not processed_messages or processed_messages[-1].get('content') != prompt:
+                        perplexity_messages.append({
+                            "role": "user",
+                            "content": prompt
+                        })
                     
                     # Prepare the request
                     headers = {

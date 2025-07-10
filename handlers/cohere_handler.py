@@ -72,6 +72,7 @@ class CohereHandler(GenerationHandler):
         # Extract system message if present
         preamble = ""
         chat_history = []
+        current_message = prompt
         
         for msg in processed_messages:
             if msg.get('role') == 'system':
@@ -81,8 +82,15 @@ class CohereHandler(GenerationHandler):
             elif msg.get('role') == 'assistant':
                 chat_history.append({"role": "CHATBOT", "message": msg.get('content', '')})
         
+        # Check if the prompt is already the last user message to avoid duplication
+        if processed_messages and processed_messages[-1].get('content') == prompt:
+            # The prompt is already in chat_history, so we need to remove it from history
+            # and use it as the current message
+            if chat_history and chat_history[-1]["role"] == "USER":
+                current_message = chat_history.pop()["message"]
+        
         request_data = {
-            "message": prompt,
+            "message": current_message,
             "max_tokens": config.MAX_TOKENS,
             "temperature": config.TEMPERATURE,
         }
